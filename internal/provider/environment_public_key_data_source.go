@@ -71,7 +71,6 @@ func (d *EnvironmentPublicKeyDataSource) Schema(ctx context.Context, req datasou
 			},
 			"public_key": schema.StringAttribute{
 				MarkdownDescription: "The public key of the GitHub repository environment.",
-				Required:            true,
 				Computed:            true,
 			},
 		},
