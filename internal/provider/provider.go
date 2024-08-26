@@ -33,8 +33,8 @@ type GitHubCryptProvider struct {
 // GitHubCryptProviderModel describes the provider data model.
 type GitHubCryptProviderModel struct {
 	Owner             types.String `tfsdk:"owner"`
-	AppID             types.Int64  `tfsdk:"app_id"`
-	AppInstallationID types.Int64  `tfsdk:"app_installation_id"`
+	AppID             types.String `tfsdk:"app_id"`
+	AppInstallationID types.String `tfsdk:"app_installation_id"`
 	PemFile           types.String `tfsdk:"pem_file"`
 }
 
@@ -144,11 +144,27 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	if !config.AppID.IsNull() {
-		appID = config.AppID.ValueInt64()
+		appIDInt, err := strconv.ParseInt((config.AppID.ValueString()), 10, 64)
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("app_id"),
+				"Failed to parse GitHub App ID",
+				"Error while converting the value from config (string) to int64.",
+			)
+		}
+		appID = appIDInt
 	}
 
 	if !config.AppInstallationID.IsNull() {
-		appInstallationID = config.AppInstallationID.ValueInt64()
+		appInstallationIDInt, err := strconv.ParseInt((config.AppInstallationID.ValueString()), 10, 64)
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("app_installation_id"),
+				"Failed to parse GitHub App Installation ID",
+				"Error while converting the value from config (string) to int64.",
+			)
+		}
+		appInstallationID = appInstallationIDInt
 	}
 
 	if !config.PemFile.IsNull() {
