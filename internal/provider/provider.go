@@ -117,22 +117,26 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 	owner := os.Getenv("GITHUB_OWNER")
 	pemFile := os.Getenv("GITHUB_PEM_FILE")
 
-	appIDString := os.Getenv("GITHUB_APP_ID")
-	appID, err := strconv.ParseInt(appIDString, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Failed to parse GitHub App ID",
-			"Error while parsing GitHub App ID from environment variable: "+err.Error(),
-		)
+	appID := os.Getenv("GITHUB_APP_ID")
+	if appID != "" {
+		_, err := strconv.ParseInt(appID, 10, 64)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Failed to parse GitHub App ID",
+				"Error while parsing GitHub App ID from environment variable: "+err.Error(),
+			)
+		}
 	}
 
-	appInstallationIDString := os.Getenv("GITHUB_APP_INSTALLATION_ID")
-	appInstallationID, err := strconv.ParseInt(appInstallationIDString, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Failed to parse GitHub App Installation ID",
-			"Error while parsing GitHub App Installation ID from environment variable: "+err.Error(),
-		)
+	appInstallationID := os.Getenv("GITHUB_APP_INSTALLATION_ID")
+	if appInstallationID != "" {
+		_, err := strconv.ParseInt(appInstallationID, 10, 64)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Failed to parse GitHub App Installation ID",
+				"Error while parsing GitHub App Installation ID from environment variable: "+err.Error(),
+			)
+		}
 	}
 
 	if resp.Diagnostics.HasError() {
@@ -144,7 +148,7 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	if !config.AppID.IsNull() {
-		appIDInt, err := strconv.ParseInt((config.AppID.ValueString()), 10, 64)
+		_, err := strconv.ParseInt((config.AppID.ValueString()), 10, 64)
 		if err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("app_id"),
@@ -152,11 +156,11 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 				"Error while converting the value from config (string) to int64.",
 			)
 		}
-		appID = appIDInt
+		appID = config.AppID.ValueString()
 	}
 
 	if !config.AppInstallationID.IsNull() {
-		appInstallationIDInt, err := strconv.ParseInt((config.AppInstallationID.ValueString()), 10, 64)
+		_, err := strconv.ParseInt((config.AppInstallationID.ValueString()), 10, 64)
 		if err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("app_installation_id"),
@@ -164,7 +168,7 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 				"Error while converting the value from config (string) to int64.",
 			)
 		}
-		appInstallationID = appInstallationIDInt
+		appInstallationID = config.AppInstallationID.ValueString()
 	}
 
 	if !config.PemFile.IsNull() {
@@ -181,7 +185,7 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 		)
 	}
 
-	if appID == 0 {
+	if appID == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("app_id"),
 			"Missing GitHub App ID",
@@ -190,7 +194,7 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 		)
 	}
 
-	if appInstallationID == 0 {
+	if appInstallationID == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("app_installation_id"),
 			"Missing GitHub App Installation ID",
@@ -213,7 +217,10 @@ func (p *GitHubCryptProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	// Configure the GitHub API client
-	itr, err := ghinstallation.New(http.DefaultTransport, appID, appInstallationID, []byte(pemFile))
+	appIDInt, _ := strconv.ParseInt(appID, 10, 64)
+	appInstallationIDInt, _ := strconv.ParseInt(appInstallationID, 10, 64)
+
+	itr, err := ghinstallation.New(http.DefaultTransport, appIDInt, appInstallationIDInt, []byte(pemFile))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Failed to create GitHub App installation client",
