@@ -66,7 +66,6 @@ func (d *EncryptedEnvironmentSecretDataSource) Schema(ctx context.Context, req d
 			"public_key_base64": schema.StringAttribute{
 				MarkdownDescription: "The public key of the GitHub repository environment encoded in Base64",
 				Required:            true,
-				Computed:            true,
 			},
 			"secret": schema.StringAttribute{
 				MarkdownDescription: "The secret to encrypt.",
