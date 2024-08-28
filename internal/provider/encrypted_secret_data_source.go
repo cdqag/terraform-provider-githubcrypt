@@ -127,7 +127,7 @@ func (d *EncryptedEnvironmentSecretDataSource) Read(ctx context.Context, req dat
 	}
 
 	// Save data into Terraform state
-	//resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
