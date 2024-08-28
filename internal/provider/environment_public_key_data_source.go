@@ -104,7 +104,7 @@ func (d *EnvironmentPublicKeyDataSource) Read(ctx context.Context, req datasourc
 	}
 
 	// Save data into Terraform state
-	//resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
