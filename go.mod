@@ -1,6 +1,6 @@
 module terraform-provider-githubcrypt
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/bradleyfalzon/ghinstallation/v2 v2.11.0
